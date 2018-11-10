@@ -1,8 +1,9 @@
 import numpy as np
 import cv2
 
+
 # Cargar imagen original (hay que hacerlo mediante la camara)
-img_original  = cv2.imread("botella50.png")
+img_original  = cv2.imread("Imagenes/botella5.jpeg")
 cv2.imshow("img_original", img_original)
 
 # Cambiar imagen original a gris
@@ -22,17 +23,29 @@ kernel = np.ones((9,9),np.uint8)
 #Se aplica la transformacion: Closing
 transformacion = cv2.morphologyEx(im_floodfill_inv,cv2.MORPH_CLOSE,kernel)
 
-img, ctrs, hier = cv2.findContours(img_binarizada.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-print(ctrs)
+image, ctrs, hier = cv2.findContours(transformacion.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+# obtenemos  los rectangulos
+rects = [cv2.boundingRect(ctr) for ctr in ctrs]
 
-# Obtener pixeles
-#n_pixeles = cv2.countNonZero(transformacion)
-n_white_pix = np.sum(transformacion == 255)
-print('Number of white pixels:', n_white_pix)
+#obtenemos el contorno mas grande
+contornoMayor = max(ctrs, key = cv2.contourArea)
+xo,yo,ancho,alto = cv2.boundingRect(contornoMayor)
+#obtenemos el roi en base a el contorno obtenido
+liquido=transformacion[yo:yo+alto,xo:xo+ancho]
 
-print(n_white_pix)
+
+
+cv2.imshow("Liquido", liquido)
+
+pixeles_blancos = np.sum(transformacion == 255)
+print('PIXELES BLANCOS:', pixeles_blancos)
+
+pixeles_negros = np.sum(transformacion == 0)
+print('PIXELES NEGROS:', pixeles_negros)
+
+
+
 cv2.imshow("img_binarizada", transformacion)
-
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
