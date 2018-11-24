@@ -28,7 +28,6 @@ while True:
         cv2.rectangle(frame_original, (xo, yo), (xo + ancho, yo + alto), (255, 0, 0), 2)
         # Obtenemos el roi en base a el contorno obtenido
         liquido = img[yo:yo+alto, xo:xo+ancho]
-        cv2.imshow("Vide22222o", liquido)
         pixeles_blancos = np.sum(liquido == 255)
 
         # Calcular la distancia entre la botella y la cámara
