@@ -9,25 +9,47 @@ def escribir_texto(imagen, texto, x, y):
     cv2.putText(imagen, texto, (x, y), font, 0.6, (0, 0, 255), 1, cv2.LINE_AA)
 
 
+def calcular_error(volumen_botella):
+    error = 0;
+
+    if volumen_botella <= 125:
+        error = const.ERROR1
+
+    elif volumen_botella <= 250:
+        error = const.ERROR2
+
+    elif volumen_botella <= 375:
+        error = const.ERROR3
+
+    elif volumen_botella <= 500:
+        error = const.ERROR4
+
+    elif volumen_botella <= 625:
+        error = const.ERROR5
+
+    elif volumen_botella <= 800:
+        error = const.ERROR6
+
+    return error
+
+
 def transformacion(imagen):
 
     # Cambiar imagen original a escala de gris
     img_gray = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
 
-    # Suavizar imagen
-    img_suavizada = cv2.GaussianBlur(img_gray, (9, 9), 0)
-
     # Binarizar imagen
-    thresh, img_binarizada = cv2.threshold(img_suavizada, 220, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    img_invertida = cv2.bitwise_not(img_binarizada)
+    thresh, img_binarizada = cv2.threshold(img_gray, 220, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
     # Crear un kernel de '1'
-    kernel = np.ones((9, 9), np.uint8)
+    kernel = np.ones((21, 21), np.uint8)
 
     # Se aplica la transformacion: Closing
-    img_transformada = cv2.morphologyEx(img_invertida, cv2.MORPH_CLOSE, kernel)
+    img_open = cv2.morphologyEx(img_binarizada, cv2.MORPH_OPEN, kernel)
+    img_close = cv2.morphologyEx(img_open, cv2.MORPH_CLOSE, kernel)
+    img_invertida = cv2.bitwise_not(img_close)
 
-    return img_transformada
+    return img_invertida
 
 
 def obtener_contorno(imagen):
@@ -41,9 +63,9 @@ def obtener_contorno(imagen):
     return None
 
 
-def distance_to_camera(knownWidth, focalLength, perWidth):
+def distance_to_camera(knownWidth, focal_length, perWidth):
 
-    distance = round((knownWidth * focalLength) / perWidth, 2)
+    distance = round((knownWidth * focal_length) / perWidth, 2)
     return distance
 
 
@@ -62,16 +84,22 @@ def obtener_distancia_focal():
     xo, yo, ancho, alto = cv2.boundingRect(c)
     cv2.rectangle(image, (xo, yo), (xo + ancho, yo + alto), (255, 0, 0), 2)
     cv2.imshow("sdsa", image)
-    '''
     print(marker)
     print(marker[1][0])
-
+    '''
+    
     if marker:
-        focalLength = (marker[1][0] * const.DISTANCIA_BOTELLA) / const.ANCHO_BOTELLA
+        focal_length = (marker[1][0] * const.DISTANCIA_BOTELLA) / const.ANCHO_BOTELLA
 
-    print(focalLength)
-    return focalLength
+    return focal_length
 
 
 def calcular_volumen(pixeles_blancos, distancia_botella):
-    return round(const.VOLUMEN_LIQUIDO * pixeles_blancos * const.DISTANCIA_BOTELLA / (const.PIXELES_LIQUIDO * distancia_botella + 2.5), 2)
+
+    volumen = round((const.VOLUMEN_LIQUIDO * pixeles_blancos / const.PIXELES_LIQUIDO) + calcular_error(distancia_botella), 2)
+    volumen += calcular_error(volumen)
+
+    return volumen
+
+
+
