@@ -9,28 +9,7 @@ def escribir_texto(imagen, texto, x, y):
     cv2.putText(imagen, texto, (x, y), font, 0.6, (0, 0, 255), 1, cv2.LINE_AA)
 
 
-def calcular_error(volumen_botella):
-    error = 0;
 
-    if volumen_botella <= 125:
-        error = const.ERROR1
-
-    elif volumen_botella <= 250:
-        error = const.ERROR2
-
-    elif volumen_botella <= 375:
-        error = const.ERROR3
-
-    elif volumen_botella <= 500:
-        error = const.ERROR4
-
-    elif volumen_botella <= 625:
-        error = const.ERROR5
-
-    elif volumen_botella <= 800:
-        error = const.ERROR6
-
-    return error
 
 
 def transformacion(imagen):
@@ -94,12 +73,10 @@ def obtener_distancia_focal():
     return focal_length
 
 
-def calcular_volumen(pixeles_blancos, distancia_botella):
+def calcular_volumen(pixeles_blancos):
 
-    volumen = round((const.VOLUMEN_LIQUIDO * pixeles_blancos / const.PIXELES_LIQUIDO) + calcular_error(distancia_botella), 2)
-    volumen += calcular_error(volumen)
+    volumen = const.VOLUMEN_LIQUIDO_CONOCIDO * pixeles_blancos  / (const.PIXELES_LIQUIDO_CONOCIDO)
 
-    return volumen
-
+    return round(volumen ,2) - const.ML_FALSOS_BASE   #se le resta los ml   que estan de exceso por la base de la botella
 
 

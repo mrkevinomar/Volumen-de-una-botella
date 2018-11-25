@@ -28,14 +28,14 @@ while True:
         cv2.rectangle(frame_original, (xo, yo), (xo + ancho, yo + alto), (255, 0, 0), 2)
         # Obtenemos el roi en base a el contorno obtenido
         liquido = img[yo:yo+alto, xo:xo+ancho]
-        cv2.imshow("asdsad", liquido)
+        cv2.imshow("ROI Liquido", liquido)
         pixeles_blancos = np.sum(liquido == 255)
 
         # Calcular la distancia entre la botella y la cámara
         marker = cv2.minAreaRect(contornoMayor)
-        distancia_botella = funcion.distance_to_camera(const.ANCHO_BOTELLA, distancia_focal, marker[1][0])
+        distancia_botella = funcion.distance_to_camera(const.ANCHO_BOTELLA, distancia_focal, marker[1][0])  -2
 
-    volumen_liquido = funcion.calcular_volumen(pixeles_blancos, distancia_botella)
+    volumen_liquido = funcion.calcular_volumen(pixeles_blancos)
 
     # Escribo datos en pantalla
     funcion.escribir_texto(frame_original, "Pixeles Liquido   : "+str(pixeles_blancos)   + " px " , 20,20)
