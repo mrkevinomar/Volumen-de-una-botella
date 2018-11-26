@@ -9,9 +9,6 @@ def escribir_texto(imagen, texto, x, y):
     cv2.putText(imagen, texto, (x, y), font, 0.6, (0, 0, 255), 1, cv2.LINE_AA)
 
 
-
-
-
 def transformacion(imagen):
 
     # Cambiar imagen original a escala de gris
@@ -20,12 +17,15 @@ def transformacion(imagen):
     # Binarizar imagen
     thresh, img_binarizada = cv2.threshold(img_gray, 220, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
-    # Crear un kernel de '1'
+    # Crear un kernel de '21'
     kernel = np.ones((21, 21), np.uint8)
 
-    # Se aplica la transformacion: Closing
+    # Se aplica la transformacion open
     img_open = cv2.morphologyEx(img_binarizada, cv2.MORPH_OPEN, kernel)
+
+    # Se aplica la transformacion close
     img_close = cv2.morphologyEx(img_open, cv2.MORPH_CLOSE, kernel)
+
     img_invertida = cv2.bitwise_not(img_close)
 
     return img_invertida
@@ -77,6 +77,6 @@ def calcular_volumen(pixeles_blancos):
 
     volumen = const.VOLUMEN_LIQUIDO_CONOCIDO * pixeles_blancos  / (const.PIXELES_LIQUIDO_CONOCIDO)
 
-    return round(volumen ,2) - const.ML_FALSOS_BASE   #se le resta los ml   que estan de exceso por la base de la botella
+    return round(volumen ,2) - const.ML_FALSOS_BASE   #se le resta los ml que estan de exceso por la base de la botella
 
 

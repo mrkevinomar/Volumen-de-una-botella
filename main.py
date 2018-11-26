@@ -16,19 +16,21 @@ while True:
 
     img = funcion.transformacion(frame_original)
 
+    # Obtener contorno mas grande
     contornoMayor = funcion.obtener_contorno(img)
 
-    # Obtener contorno mas grande
     pixeles_blancos = 0
     distancia_botella = 0
 
     if len(contornoMayor) > 0:
 
+        # Obtenemos el roi en base a el contorno obtenido
         xo, yo, ancho, alto = cv2.boundingRect(contornoMayor)
         cv2.rectangle(frame_original, (xo, yo), (xo + ancho, yo + alto), (255, 0, 0), 2)
-        # Obtenemos el roi en base a el contorno obtenido
         liquido = img[yo:yo+alto, xo:xo+ancho]
         cv2.imshow("ROI Liquido", liquido)
+
+        # Se obtiene la cantidad de pixeles blancos
         pixeles_blancos = np.sum(liquido == 255)
 
         # Calcular la distancia entre la botella y la cámara
